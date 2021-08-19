@@ -77,6 +77,4 @@ public class PlayerController : MonoBehaviour
         return new Vector2(xMag, yMag);
         
     }
-    
-    public 
 }
