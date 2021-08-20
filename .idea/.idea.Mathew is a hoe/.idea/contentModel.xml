@@ -2,8 +2,39 @@
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Unity\Projects\Mathew is a hoe" t="IncludeRecursive">
+      <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
+        <e p="LowPolyLight(Lite)" t="Include">
+          <e p="Effect" t="Include">
+            <e p="Bloom.cs" t="Include" />
+            <e p="Bloom.shader" t="Include" />
+          </e>
+        </e>
+        <e p="PyroParticles" t="Include">
+          <e p="Demo" t="Include">
+            <e p="DemoScript.cs" t="Include" />
+            <e p="DemoScriptEditor.cs" t="Include" />
+          </e>
+          <e p="Prefab" t="Include">
+            <e p="Editor" t="Include">
+              <e p="PyroParticlesEditor.cs" t="Include" />
+            </e>
+            <e p="Materials" t="Include">
+              <e p="AdditiveTintable.shader" t="Include" />
+            </e>
+            <e p="Script" t="Include">
+              <e p="FireBaseScript.cs" t="Include" />
+              <e p="FireCollisionForwardScript.cs" t="Include" />
+              <e p="FireConstantBaseScript.cs" t="Include" />
+              <e p="FireLightScript.cs" t="Include" />
+              <e p="FireProjectileScript.cs" t="Include" />
+              <e p="MeteorSwarmScript.cs" t="Include" />
+              <e p="SingleLineAttribute.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Readme.txt" t="Include" />
+        </e>
         <e p="Scripts" t="Include">
           <e p="Player" t="Include">
             <e p="CameraFollow.cs" t="Include" />
