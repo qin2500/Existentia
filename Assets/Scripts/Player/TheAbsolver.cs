@@ -13,6 +13,8 @@ public class TheAbsolver : MonoBehaviour
     public SpringJoint spring;
     public bool grappling = false;
 
+    //public int springForce = 5;
+
     [Header("Spring Settings")] public float damper, maxDistance, minDistance, springForce, massScale;
     
     void Start()
@@ -23,19 +25,23 @@ public class TheAbsolver : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(1) && !grappling)
+        if (Input.GetMouseButtonDown(0) && !grappling)
         {
             grapple();
-            grappling = true;           
+            grappling = true;
         }
-        else if(Input.GetMouseButtonUp(1) && grappling)
+        else if(Input.GetMouseButtonUp(0) && grappling)
         {
             release();
             grappling = false;
             lr.positionCount = 0;
         }
 
-        
+        if (Input.GetKeyDown(KeyCode.Q))
+            springForce = 200;
+
+        else if (Input.GetKeyUp(KeyCode.Q))
+            springForce = 5;
     }
 
     private void LateUpdate()
@@ -45,7 +51,6 @@ public class TheAbsolver : MonoBehaviour
             lr.SetPosition(0, muzzle.position);
             lr.SetPosition(1,hookPoint);
         }
-        
     }
 
     public void grapple()
@@ -59,7 +64,6 @@ public class TheAbsolver : MonoBehaviour
             spring.autoConfigureConnectedAnchor = false;
             spring.connectedAnchor = hookPoint;
             
-
             float distance = Vector3.Distance(hookPoint, player.transform.position);
             
             spring.damper = damper;
