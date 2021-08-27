@@ -38,7 +38,7 @@ public class TheAbsolver : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
-            springForce = 200;
+            springForce = 175;
 
         else if (Input.GetKeyUp(KeyCode.Q))
             springForce = 5;

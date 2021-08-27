@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControler2ElectricBoogaloo : MonoBehaviour
+public class Jizz : MonoBehaviour
 {
     public Transform playerCam;
+    public Transform orientation;
     
     private Rigidbody rb;
 
@@ -26,6 +27,13 @@ public class PlayerControler2ElectricBoogaloo : MonoBehaviour
     public float jumpForce = 550f;
     float x, y;
     private bool jumping;
+
+    //Wallrunning variables
+    public LayerMask whatIsWall;
+    public float wallrunForce, maxWallrunTime, maxWallrunSpeed;
+    public bool wallRight, wallLeft, onWall;
+    public bool wallrunning, forwardPressed;
+    public float maxWallrunCamTilt, wallrunCamTilt;
     
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
@@ -46,6 +54,9 @@ public class PlayerControler2ElectricBoogaloo : MonoBehaviour
     private void Update() {
         MyInput();
         Look();
+
+        //CheckForWall();
+        WallrunInput();
     }
 
     private void MyInput() {
@@ -89,15 +100,24 @@ public class PlayerControler2ElectricBoogaloo : MonoBehaviour
         if (grounded && readyToJump) {
             readyToJump = false;
 
-            rb.AddForce(Vector2.up * jumpForce * 1.5f);
-            rb.AddForce(normalVector * jumpForce * 0.5f);
-            
-            Vector3 vel = rb.velocity;
-            if (rb.velocity.y < 0.5f)
-                rb.velocity = new Vector3(vel.x, 0, vel.z);
-            else if (rb.velocity.y > 0) 
-                rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
-            
+            if(!wallrunning)
+            {
+                rb.AddForce(Vector2.up * jumpForce * 1.5f);
+                rb.AddForce(normalVector * jumpForce * 0.5f);
+                
+                Vector3 vel = rb.velocity;
+                if (rb.velocity.y < 0.5f)
+                    rb.velocity = new Vector3(vel.x, 0, vel.z);
+                else if (rb.velocity.y > 0) 
+                    rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
+            }
+
+            else 
+            {
+                if(wallRight) rb.AddForce(-orientation.right * jumpForce);
+                else rb.AddForce(orientation.right * jumpForce);
+            }
+
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
@@ -157,6 +177,10 @@ public class PlayerControler2ElectricBoogaloo : MonoBehaviour
     
     private void OnCollisionStay(Collision other) {
         int layer = other.gameObject.layer;
+
+        if(whatIsWall == (whatIsWall | (1 << layer))) onWall = true;
+        else if(whatIsWall != (whatIsWall | (1 << layer))) onWall = false;
+
         if (whatIsGround != (whatIsGround | (1 << layer))) return;
 
         for (int i = 0; i < other.contactCount; i++) {
@@ -179,5 +203,49 @@ public class PlayerControler2ElectricBoogaloo : MonoBehaviour
 
     private void StopGrounded() {
         grounded = false;
+    }
+
+    //Wallrun functions
+    public void WallrunInput()
+    {
+        if(Input.GetKeyDown(KeyCode.W)) forwardPressed = true;
+        if(Input.GetKeyUp(KeyCode.W)) forwardPressed = false;
+
+        if(forwardPressed && onWall) StartWallrun();
+        else StopWallrun();
+    }
+
+    public void StartWallrun()
+    {
+        rb.useGravity = false;
+        wallrunning = true;
+    }
+
+    public void StopWallrun()
+    {
+        rb.useGravity = true;
+        wallrunning = false;
+
+        if(rb.velocity.magnitude <= maxWallrunSpeed)
+        {
+            rb.AddForce(orientation.forward * wallrunForce * Time.deltaTime);
+
+            if(wallRight)
+                rb.AddForce(orientation.right * wallrunForce/5 * Time.deltaTime);
+
+            else if (wallLeft)
+                rb.AddForce(-orientation.right * wallrunForce * Time.deltaTime);   
+        }
+    }
+
+    public void CheckForWall()
+    {
+        if(!onWall) StopWallrun();
+
+        else 
+        {
+            wallRight = Physics.Raycast(transform.position, orientation.right, 1f, whatIsWall);
+            wallLeft = Physics.Raycast(transform.position, -orientation.right, 1f, whatIsWall);
+        }
     }
 }
