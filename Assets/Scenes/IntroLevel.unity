@@ -31010,9 +31010,9 @@ MonoBehaviour:
   whatIsWall:
     serializedVersion: 2
     m_Bits: 512
-  wallrunForce: 100
+  wallrunForce: 100000
   maxWallrunTime: 10
-  maxWallrunSpeed: 5000
+  maxWallrunSpeed: 100000
   wallRight: 0
   wallLeft: 0
   onWall: 0
@@ -37489,7 +37489,8 @@ PrefabInstance:
       propertyPath: springForce
       value: 51
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1347074084401367597, guid: 5a402db46ea34f14e84cf82cbf9634aa, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 5a402db46ea34f14e84cf82cbf9634aa, type: 3}
 --- !u!43 &1821636903
 Mesh:
