@@ -9,13 +9,13 @@ public class Jizz : MonoBehaviour {
     
     private Rigidbody rb;
 
+    public LayerMask whatIsGround;
     private float xRotation;
     public float sensitivity = 175f;
     private float sensMultiplier = 1f;
     public float moveSpeed = 4500;
     public float maxSpeed = 20;
-    public bool grounded;
-    public LayerMask whatIsGround;
+    private bool grounded;
     
     public float counterMovement = 0.175f;
     private float threshold = 0.01f;
@@ -24,15 +24,15 @@ public class Jizz : MonoBehaviour {
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
     public float jumpForce = 550f;
-    float x, y;
+    private float x, y;
     private bool jumping;
 
     //Wallrunning variables
     public LayerMask whatIsWall;
     public float wallrunForce, maxWallrunTime, maxWallrunSpeed;
-    public bool wallRight, wallLeft, onWall;
-    public bool wallrunning, forwardPressed;
     public float maxWallrunCamTilt, wallrunCamTilt;
+    public bool wallRight, onWall;
+    public bool wallrunning, forwardPressed;
     
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
@@ -54,16 +54,14 @@ public class Jizz : MonoBehaviour {
         MyInput();
         Look();
 
-        //CheckForWall();
         WallrunInput();
     }
 
-    private void MyInput() {
+    private void MyInput() {                                                                       //Keyboard input
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
     }
-
 
     private void Movement() {
 
@@ -72,7 +70,9 @@ public class Jizz : MonoBehaviour {
 
         Vector3 forwardVelocity = Vector3.Project(rb.velocity, rb.transform.forward);
 
-        if (wallrunning && rb.velocity.magnitude < maxWallrunSpeed) {
+        if (readyToJump && jumping) Jump();
+
+        if (wallrunning && rb.velocity.magnitude < maxWallrunSpeed) {                              //Wallrun movement
             rb.AddForce(this.transform.forward * wallrunForce * Time.deltaTime);
             //rb.AddForce(this.transform.right * 50);
 
@@ -82,8 +82,6 @@ public class Jizz : MonoBehaviour {
         rb.AddForce(Vector3.down * Time.deltaTime * 10);                                            //Gravity force
 
         CounterMovement(x, y, mag);
-        
-        if (readyToJump && jumping) Jump();
 
         float maxSpeed = this.maxSpeed;
         
@@ -122,28 +120,30 @@ public class Jizz : MonoBehaviour {
     }
 
     private void Jump() {
-        if (grounded && readyToJump) {
-            readyToJump = false;
 
-            if (!wallrunning) {
-                rb.AddForce(Vector2.up * jumpForce * 1.5f);
-                rb.AddForce(normalVector * jumpForce * 0.5f);
+        if (grounded && readyToJump) {                                                      //Normal jump
+
+            rb.AddForce(Vector2.up * jumpForce * 1.5f);
+            rb.AddForce(normalVector * jumpForce * 0.5f);
                 
-                Vector3 vel = rb.velocity;
-                if (rb.velocity.y < 0.5f)
-                    rb.velocity = new Vector3(vel.x, 0, vel.z);
-                else if (rb.velocity.y > 0) 
-                    rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
-            }
+            Vector3 vel = rb.velocity;
 
-            else 
-            {
-                if (wallRight) rb.AddForce(-orientation.right * jumpForce);
-                else rb.AddForce(this.transform.right * jumpForce);
-            }
+            if (rb.velocity.y < 0.5f)
+                rb.velocity = new Vector3(vel.x, 0, vel.z);
 
-            Invoke(nameof(ResetJump), jumpCooldown);
+            else if (rb.velocity.y > 0) 
+                rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
         }
+
+        else if (wallrunning && readyToJump) {                                              //Wallrun jump
+            wallrunning = false;
+
+            if (wallRight) rb.AddForce(-this.transform.right * jumpForce * 2);
+            else rb.AddForce(this.transform.right * jumpForce * 2);
+        }
+
+        readyToJump = false;
+        Invoke(nameof(ResetJump), jumpCooldown);
     }
     
     private void ResetJump() {
@@ -212,7 +212,17 @@ public class Jizz : MonoBehaviour {
         int layer = other.gameObject.layer;
 
         //Enter collision with runnable wall
-        if (whatIsWall == (whatIsWall | (1 << layer))) onWall = true;
+        if (whatIsWall == (whatIsWall | (1 << layer))) {
+
+            onWall = true;
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, Mathf.Infinity, whatIsWall))
+                wallRight = true;
+            else if (Physics.Raycast(transform.position, transform.TransformDirection(-Vector3.right), out hit, Mathf.Infinity, whatIsWall))
+                wallRight = false;
+        }
         else if (whatIsWall != (whatIsWall | (1 << layer))) onWall = false;
     }
 
@@ -220,7 +230,9 @@ public class Jizz : MonoBehaviour {
         int layer = other.gameObject.layer;
 
         //Exit collision with runnable wall
-        if (whatIsWall == (whatIsWall | (1 << layer))) onWall = false;
+        if (whatIsWall == (whatIsWall | (1 << layer))) {
+            onWall = false;
+        }
     }
 
     private void StopGrounded() {
@@ -253,16 +265,21 @@ public class Jizz : MonoBehaviour {
 
             if (wallRight) rb.AddForce(orientation.right * wallrunForce/5 * Time.deltaTime);
 
-            else if (wallLeft) rb.AddForce(-orientation.right * wallrunForce * Time.deltaTime);   
+            else rb.AddForce(-orientation.right * wallrunForce * Time.deltaTime);   
         }
     }
 
-    public void CheckForWall() {
-        if (!onWall) StopWallrun();
+    public void CheckWall(Collision other) {
+        /*
+        Vector3 direction = other.transform.position - this.transform.position;
+        
+        direction = direction.normal;
 
-        else {
-            wallRight = Physics.Raycast(transform.position, orientation.right, 1f, whatIsWall);
-            wallLeft = Physics.Raycast(transform.position, -orientation.right, 1f, whatIsWall);
-        }
+        direction = Vector3.Dot(transform.forward, direction);
+
+        normal = rayHit.transform.transformdirection(normal);
+
+        if (normal == rayHit.transform.right) wallRight = true;
+        else if (normal == -rayHit.transform.right) wallRight = false;*/
     }
 }
