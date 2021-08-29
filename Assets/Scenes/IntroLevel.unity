@@ -31022,29 +31022,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCam: {fileID: 1485744689}
   orientation: {fileID: 0}
-  sensitivity: 200
-  moveSpeed: 4500
-  maxSpeed: 20
-  grounded: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 256
+  sensitivity: 200
+  moveSpeed: 4500
+  maxSpeed: 20
   counterMovement: 0.175
   maxSlopeAngle: 35
   jumpForce: 800
   whatIsWall:
     serializedVersion: 2
     m_Bits: 512
-  wallrunForce: 80000
+  wallrunForce: 3000
   maxWallrunTime: 10
-  maxWallrunSpeed: 10000
+  maxWallrunSpeed: 5000
+  maxWallrunCamTilt: 30
+  wallrunCamTilt: 0
   wallRight: 0
-  wallLeft: 0
   onWall: 0
   wallrunning: 0
   forwardPressed: 0
-  maxWallrunCamTilt: 0
-  wallrunCamTilt: 0
 --- !u!1 &1355260738
 GameObject:
   m_ObjectHideFlags: 0

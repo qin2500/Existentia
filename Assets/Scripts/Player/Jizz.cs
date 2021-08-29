@@ -15,8 +15,8 @@ public class Jizz : MonoBehaviour {
     private float sensMultiplier = 1f;
     public float moveSpeed = 4500;
     public float maxSpeed = 20;
-    private bool grounded;
-    
+    private bool grounded, cancellingGrounded;
+
     public float counterMovement = 0.175f;
     private float threshold = 0.01f;
     public float maxSlopeAngle = 35f;
@@ -61,6 +61,9 @@ public class Jizz : MonoBehaviour {
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
+
+        if (Input.GetKeyDown(KeyCode.W)) forwardPressed = true;
+        if (Input.GetKeyUp(KeyCode.W)) forwardPressed = false;
     }
 
     private void Movement() {
@@ -138,8 +141,12 @@ public class Jizz : MonoBehaviour {
         else if (wallrunning && readyToJump) {                                              //Wallrun jump
             wallrunning = false;
 
-            if (wallRight) rb.AddForce(-this.transform.right * jumpForce * 2);
-            else rb.AddForce(this.transform.right * jumpForce * 2);
+            if (rb.velocity.magnitude < maxWallrunSpeed) rb.AddForce(this.transform.forward * jumpForce/2 * 3);
+
+            if (wallRight) rb.AddForce(-this.transform.right * jumpForce/2 * 3);
+            else rb.AddForce(this.transform.right * jumpForce/2 * 3);
+
+            rb.AddForce(this.transform.up * jumpForce/2 * 3);
         }
 
         readyToJump = false;
@@ -159,7 +166,7 @@ public class Jizz : MonoBehaviour {
         _xRotation -= mouseY;
         _xRotation = Mathf.Clamp(_xRotation, -90f, 90f);
 
-        playerCam.localRotation = Quaternion.Euler(_xRotation,0f,0f);
+        playerCam.localRotation = Quaternion.Euler(_xRotation, 0f, wallrunCamTilt);
         this.transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -181,8 +188,6 @@ public class Jizz : MonoBehaviour {
         float angle = Vector3.Angle(Vector3.up, v);
         return angle < maxSlopeAngle;
     }
-
-    private bool cancellingGrounded;
     
     private void OnCollisionStay(Collision other) {
         int layer = other.gameObject.layer;
@@ -213,16 +218,10 @@ public class Jizz : MonoBehaviour {
 
         //Enter collision with runnable wall
         if (whatIsWall == (whatIsWall | (1 << layer))) {
-
             onWall = true;
-
-            RaycastHit hit;
-
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, Mathf.Infinity, whatIsWall))
-                wallRight = true;
-            else if (Physics.Raycast(transform.position, transform.TransformDirection(-Vector3.right), out hit, Mathf.Infinity, whatIsWall))
-                wallRight = false;
+            CheckWall(whatIsWall);
         }
+
         else if (whatIsWall != (whatIsWall | (1 << layer))) onWall = false;
     }
 
@@ -230,7 +229,8 @@ public class Jizz : MonoBehaviour {
         int layer = other.gameObject.layer;
 
         //Exit collision with runnable wall
-        if (whatIsWall == (whatIsWall | (1 << layer))) {
+        if (whatIsWall == (whatIsWall | (1 << layer)) && wallrunning) {
+            Debug.Log("exit");
             onWall = false;
         }
     }
@@ -241,16 +241,27 @@ public class Jizz : MonoBehaviour {
 
     //Wallrun functions
     public void WallrunInput() {
-        if (Input.GetKeyDown(KeyCode.W)) forwardPressed = true;
-        if (Input.GetKeyUp(KeyCode.W)) forwardPressed = false;
-
         if (forwardPressed && onWall && !grounded) StartWallrun();
         else StopWallrun();
+
+        //Tilt camera during wall runs
+        if (Math.Abs(wallrunCamTilt) < maxWallrunCamTilt && wallrunning && wallRight)
+            wallrunCamTilt += Time.deltaTime * maxWallrunCamTilt * 2;
+        else if (Math.Abs(wallrunCamTilt) < maxWallrunCamTilt && wallrunning && !wallRight)
+            wallrunCamTilt -= Time.deltaTime * maxWallrunCamTilt * 2;
+
+        if (wallrunCamTilt > 0 && !wallrunning && wallRight)
+            wallrunCamTilt -= Time.deltaTime * maxWallrunCamTilt * 2;
+        else if (wallrunCamTilt < 0 && !wallrunning && !wallRight)
+            wallrunCamTilt += Time.deltaTime * maxWallrunCamTilt * 2;
     }
 
     public void StartWallrun() {
+        if(wallrunning) return;
+
         rb.useGravity = false;
         wallrunning = true;
+        readyToJump = true;
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -259,27 +270,14 @@ public class Jizz : MonoBehaviour {
     public void StopWallrun() {
         rb.useGravity = true;
         wallrunning = false;
-
-        if (rb.velocity.magnitude <= maxWallrunSpeed) {
-            rb.AddForce(orientation.forward * wallrunForce * Time.deltaTime);
-
-            if (wallRight) rb.AddForce(orientation.right * wallrunForce/5 * Time.deltaTime);
-
-            else rb.AddForce(-orientation.right * wallrunForce * Time.deltaTime);   
-        }
     }
 
-    public void CheckWall(Collision other) {
-        /*
-        Vector3 direction = other.transform.position - this.transform.position;
-        
-        direction = direction.normal;
+    public void CheckWall(LayerMask layer) {
+        RaycastHit hit;
 
-        direction = Vector3.Dot(transform.forward, direction);
-
-        normal = rayHit.transform.transformdirection(normal);
-
-        if (normal == rayHit.transform.right) wallRight = true;
-        else if (normal == -rayHit.transform.right) wallRight = false;*/
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, Mathf.Infinity, layer))
+            wallRight = true;
+        else if (Physics.Raycast(transform.position, transform.TransformDirection(-Vector3.right), out hit, Mathf.Infinity, layer))
+            wallRight = false;    
     }
 }
