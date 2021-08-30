@@ -141,10 +141,10 @@ public class Jizz : MonoBehaviour {
         else if (wallrunning && readyToJump) {                                              //Wallrun jump
             wallrunning = false;
 
-            if (rb.velocity.magnitude < maxWallrunSpeed) rb.AddForce(this.transform.forward * jumpForce/2 * 3);
+            if (rb.velocity.magnitude < maxWallrunSpeed) rb.AddForce(this.transform.forward * jumpForce/5 * 7);
 
-            if (wallRight) rb.AddForce(-this.transform.right * jumpForce/2 * 3);
-            else rb.AddForce(this.transform.right * jumpForce/2 * 3);
+            if (wallRight) rb.AddForce(-this.transform.right * jumpForce/5 * 7);
+            else rb.AddForce(this.transform.right * jumpForce/5 * 7);
 
             rb.AddForce(this.transform.up * jumpForce/2 * 3);
         }
@@ -201,6 +201,7 @@ public class Jizz : MonoBehaviour {
                 grounded = true;
                 cancellingGrounded = false;
                 normalVector = normal;
+                wallrunCamTilt = 0;
                 CancelInvoke(nameof(StopGrounded));
             }
         }
@@ -229,7 +230,7 @@ public class Jizz : MonoBehaviour {
         int layer = other.gameObject.layer;
 
         //Exit collision with runnable wall
-        if (whatIsWall == (whatIsWall | (1 << layer)) && wallrunning) {
+        if (whatIsWall == (whatIsWall | (1 << layer))) {
             Debug.Log("exit");
             onWall = false;
         }
@@ -254,6 +255,8 @@ public class Jizz : MonoBehaviour {
             wallrunCamTilt -= Time.deltaTime * maxWallrunCamTilt * 2;
         else if (wallrunCamTilt < 0 && !wallrunning && !wallRight)
             wallrunCamTilt += Time.deltaTime * maxWallrunCamTilt * 2;
+
+        if (Math.Abs(wallrunCamTilt) < 1 && !wallrunning) wallrunCamTilt = 0;
     }
 
     public void StartWallrun() {
