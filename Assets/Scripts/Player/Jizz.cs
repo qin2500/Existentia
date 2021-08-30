@@ -77,7 +77,9 @@ public class Jizz : MonoBehaviour {
 
         if (wallrunning && rb.velocity.magnitude < maxWallrunSpeed) {                              //Wallrun movement
             rb.AddForce(this.transform.forward * wallrunForce * Time.deltaTime);
-            //rb.AddForce(this.transform.right * 50);
+
+            if (wallRight) rb.AddForce(this.transform.right * wallrunForce * Time.deltaTime);
+            else rb.AddForce(-this.transform.right * wallrunForce * Time.deltaTime);
 
             return;
         }
@@ -100,6 +102,8 @@ public class Jizz : MonoBehaviour {
             multiplierV = 0.5f;
         }
         
+        if(wallrunning) x = 0;
+
         rb.AddForce(this.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV);
         rb.AddForce(this.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
     }
@@ -230,10 +234,8 @@ public class Jizz : MonoBehaviour {
         int layer = other.gameObject.layer;
 
         //Exit collision with runnable wall
-        if (whatIsWall == (whatIsWall | (1 << layer))) {
-            Debug.Log("exit");
+        if (whatIsWall == (whatIsWall | (1 << layer))) 
             onWall = false;
-        }
     }
 
     private void StopGrounded() {
