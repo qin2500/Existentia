@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Jizz : MonoBehaviour {
     public Transform playerCam;
-    public Transform orientation;
-    
     private Rigidbody rb;
 
     public LayerMask whatIsGround;

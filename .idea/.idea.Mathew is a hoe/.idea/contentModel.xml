@@ -5,13 +5,7 @@
       <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
-        <e p="LowPolyLight(Lite)" t="Include">
-          <e p="Effect" t="Include">
-            <e p="Bloom.cs" t="Include" />
-            <e p="Bloom.shader" t="Include" />
-          </e>
-        </e>
-        <e p="PyroParticles" t="Include">
+        <e p="Fire Effects" t="Include">
           <e p="Demo" t="Include">
             <e p="DemoScript.cs" t="Include" />
             <e p="DemoScriptEditor.cs" t="Include" />
@@ -35,9 +29,16 @@
           </e>
           <e p="Readme.txt" t="Include" />
         </e>
+        <e p="Floor Lights" t="Include">
+          <e p="Effect" t="Include">
+            <e p="Bloom.cs" t="Include" />
+            <e p="Bloom.shader" t="Include" />
+          </e>
+        </e>
         <e p="Scripts" t="Include">
           <e p="Player" t="Include">
             <e p="CameraFollow.cs" t="Include" />
+            <e p="Jizz.cs" t="Include" />
             <e p="PlayerControler2ElectricBoogaloo.cs" t="Include" />
             <e p="PlayerController.cs" t="Include" />
             <e p="TheAbsolver.cs" t="Include" />
