@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1347074084401367596}
   - component: {fileID: 1347074084401367594}
   - component: {fileID: 1347074084401367597}
+  - component: {fileID: 513678149884429791}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -58,7 +59,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1347074084401367598}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3f507fcee34b5b4aaa26f72b7a13110, type: 3}
   m_Name: 
@@ -74,6 +75,41 @@ MonoBehaviour:
   counterMovement: 0.175
   maxSlopeAngle: 35
   jumpForce: 800
+--- !u!114 &513678149884429791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347074084401367598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 326780322d4f04143ba51b636f0bbd7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCam: {fileID: 0}
+  orientation: {fileID: 0}
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 0
+  sensitivity: 175
+  moveSpeed: 4500
+  maxSpeed: 20
+  counterMovement: 0.175
+  maxSlopeAngle: 35
+  jumpForce: 550
+  whatIsWall:
+    serializedVersion: 2
+    m_Bits: 0
+  wallrunForce: 0
+  maxWallrunTime: 0
+  maxWallrunSpeed: 0
+  maxWallrunCamTilt: 0
+  wallrunCamTilt: 0
+  wallRight: 0
+  onWall: 0
+  wallrunning: 0
+  forwardPressed: 0
 --- !u!1 &1347074085175443859
 GameObject:
   m_ObjectHideFlags: 0
